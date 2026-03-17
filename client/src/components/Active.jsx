@@ -1,4 +1,5 @@
-import { Box, Text, Flex, keyframes, Tooltip } from "@chakra-ui/react";
+import { Box, Text, Flex, Tooltip } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import React from "react";
 
 export default function Active() {

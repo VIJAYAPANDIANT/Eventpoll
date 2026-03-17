@@ -1,8 +1,7 @@
 const express = require("express")
 const cors = require('cors');
 const {userController}= require("./routes/user.routes")
-const {firebaseController}= require("./routes/poll.firebase.routes")
-const {Connection, firebase} = require("./config/db");
+const { pool } = require("./config/db");
 const authController=require("./routes/signin.routes");
 const {convertPollData}= require("./utils/utils");
 const {pollController}=require("./routes/poll.routes");;
@@ -17,9 +16,6 @@ const swaggerUI= require("swagger-ui-express");
 const YAML= require("yamljs");
 const swaggerJsDocs= YAML.load("./api.yaml");
 
-const fireDb = firebase.database(); 
-const ref = fireDb.ref("polls");
-
 app.use(express.json());
 app.use(cors());
 
@@ -29,7 +25,6 @@ app.get("/", (req, res) => {
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJsDocs));
 app.use("/user", userController);
-app.use("/firebase", firebaseController);
 app.use("/auth", authController);
 app.use("/poll",pollController);
 app.use("/template",templateController);
@@ -43,19 +38,9 @@ const io = new Server({
 });
 
 io.on("connection", (socket) => {
-  socket.on("getPollData", (pollId) => {
-    const pollRef = fireDb.ref(`polls/${pollId}`);
-    pollRef.on("value", async (snapshot) => {
-      const pollData = snapshot.val();
-      if (!pollData) {
-        socket.emit("pollDeleted");
-        return;
-      }
-      const newPollData = await convertPollData(pollData);
-      socket.emit("pollData", newPollData);
-    }, (error) => {
-      console.error(`Error getting poll data with ID ${pollId}: `, error);
-    });
+  console.log("Socket connected:", socket.id);
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
   });
 });
 
@@ -67,11 +52,11 @@ io.attach(server);
 
 server.listen(PORT, async () => {
   try {
-    await Connection;
-    await firebase;
-    console.log("Server is connected to database");
+    const client = await pool.connect();
+    console.log("Server is connected to PostgreSQL (Neon) database");
+    client.release();
     console.log(`server is running on ${PORT}`);
   } catch (err) {
-    console.log(err);
+    console.error("Database connection failed:", err);
   }
 });

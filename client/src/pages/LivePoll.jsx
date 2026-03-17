@@ -28,7 +28,7 @@ function LivePoll() {
 	const dispatch = useDispatch();
 	const [searchTerm, setSearchTerm] = useState("");
 	let token = localStorage.getItem("adminToken");
-	const [postsPerPage, setPostsPerPage] = useState(8);
+	const [postsPerPage] = useState(8);
 	const [currentPage, setCurrentPage] = useState(0);
 	const live = useSelector((store) => store.data.liveData).reverse();
 	const pageNumbers = [];
@@ -38,8 +38,8 @@ function LivePoll() {
 	
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 	const getPageData = () => {
-		const start = currentPage * 8;
-		const end = start + 8;
+		const start = currentPage * postsPerPage;
+		const end = start + postsPerPage;
 		return live.slice(start, end);
 	};
 	const handleNext = () => {
@@ -101,15 +101,10 @@ function LivePoll() {
           templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
         >
           {getPageData()
-            .filter((val) => {
-              if (searchTerm === "") {
-                return val;
-              } else if (
-                val.pollName?.toLowerCase()?.includes(searchTerm?.toLowerCase())
-              ) {
-                return val;
-              }
-            })
+            .filter((val) =>
+              searchTerm === "" ||
+              val.pollName?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+            )
             .map((item) => (
               <Card borderRadius={"none"} border={"1px solid #C0C9CC"}>
                 <CardHeader>
@@ -168,7 +163,7 @@ function LivePoll() {
           ))}
 
           <Button
-            isDisabled={currentPage >= Math.ceil(live.length / 12) - 1}
+            isDisabled={currentPage >= Math.ceil(live.length / postsPerPage) - 1}
             onClick={handleNext}
             color={"white"}
             bgColor={"#FFC1C3"}

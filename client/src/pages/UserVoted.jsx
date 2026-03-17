@@ -1,5 +1,4 @@
 import {
-	Box,
 	Button,
 	Container,
 	Heading,
@@ -38,7 +37,7 @@ const data = useSelector((store)=>store.data.userVoted)
 
      dispatch(userVotedData(data,token))
 
-    },[])
+    },[dispatch,optionId,pollId,questionId,token])
 
  
     const  handleClick = ()=>{

@@ -34,7 +34,7 @@ const QuestionCard = ({
       };
       onSelectionChange(payload);
     }
-  }, [value]);
+  }, [value, type, question, questionId, options, onSelectionChange, maxSelections]);
 
 
   /* useEffect function for calling the parent function (onSelectionChange) 
@@ -50,7 +50,7 @@ const QuestionCard = ({
       };
       onSelectionChange(payload);
     }
-  }, [isDisabled]);
+  }, [isDisabled, value, question, questionId, options, onSelectionChange]);
 
   return (
     <Box className={styles.container}>
@@ -78,7 +78,7 @@ const QuestionCard = ({
                 {
                   <Checkbox
                     disabled={
-                      value.length == maxSelections &&
+                      value.length === maxSelections &&
                       !value.includes(e.optionId)
                     }
                     className="option"

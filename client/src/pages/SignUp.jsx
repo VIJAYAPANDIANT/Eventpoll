@@ -16,12 +16,14 @@ import {
     Text,
     useToast
   } from '@chakra-ui/react';
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
   
 import { useEffect, useState } from 'react';
 import validator from 'validator';
 import Layout from '../components/Layout';
 import { useDispatch } from 'react-redux';
-import { signUp } from '../redux/auth/action';
+import { signUp, googleSignInAuth } from '../redux/auth/action';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,6 +40,50 @@ import { useNavigate } from 'react-router-dom';
     const navigate = useNavigate();
     const toast = useToast()
     const error = useSelector((store) => store.auth.error);
+    
+    const handleGoogleLogin = useGoogleLogin({
+      onSuccess: async (tokenResponse) => {
+        try {
+          const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+          });
+          
+          const googleData = {
+            email: res.data.email,
+            fullName: res.data.name,
+            role: "user",
+            token: { primaryToken: tokenResponse.access_token }
+          };
+  
+          dispatch(googleSignInAuth(googleData));
+          toast({
+            title: "Login Successful",
+            description: `Welcome back, ${res.data.name}!`,
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        } catch (err) {
+          console.error(err);
+          toast({
+            title: "Google Login Failed",
+            description: "Could not fetch user info from Google.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      },
+      onError: () => {
+        toast({
+          title: "Google Login Failed",
+          description: "Login was unsuccessful. Please try again.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+    });
 
 const handleClick = ()=>{
   
@@ -100,10 +146,10 @@ useEffect(()=>{
 
 
 useEffect(()=>{
-if(error?.response?.data){
+if(error?.response?.data?.msg){
   toast({
-    title: 'Account already exist.',
-    description: "Please login.",
+    title: error.response.data.msg,
+    description: "Please check your details and try again.",
     status: 'warning',
     duration: 9000,
     isClosable: true,
@@ -171,14 +217,16 @@ if(error?.response?.data){
               </Button>
               <Text fontFamily={"Open Sans"}>OR</Text>
               <Button
-        w={'full'}
-        maxW={'md'}
-        variant={'outline'}
-        leftIcon={<FcGoogle />}>
-        <Center>
-          <Text fontFamily={"Open Sans"}>Sign in with Google</Text>
-        </Center>
-      </Button>
+                w={'full'}
+                maxW={'md'}
+                variant={'outline'}
+                leftIcon={<FcGoogle />}
+                onClick={() => handleGoogleLogin()}
+              >
+                <Center>
+                  <Text fontFamily={"Open Sans"}>Sign in with Google</Text>
+                </Center>
+              </Button>
             </Stack>
             <Text fontFamily={"Open Sans"} align={'center'}>
                aleady an account? <Link color={'red.400'} href="/signin">Sign-in</Link>

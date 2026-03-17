@@ -1,5 +1,5 @@
 const { text } = require("express");
-const mongoose = require("mongoose");
+const mongose = require("mongoose");
 
 const OptionSchema = new mongoose.Schema({
     option: String,

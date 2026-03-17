@@ -1,0 +1,19 @@
+{
+  "name": "eventpoll-root",
+  "version": "1.0.0",
+  "description": "Root package for Eventpoll monorepo",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "start:client": "npm start --workspace=client",
+    "start:server": "npm start --workspace=server",
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

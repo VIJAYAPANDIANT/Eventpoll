@@ -44,14 +44,14 @@ function TemplatePage() {
 	const finalRef = useRef(null);
 
 
-	const data = useSelector((store) => store.data.data) || [];
+	const data = useSelector((store) => store.data.data);
 
 	const dispatch = useDispatch();
 	const [dataArray, setDataArray] = useState([]);
-	const dataById = useSelector((store)=>store.data.dataDetails)||[]
+	const dataById = useSelector((store)=>store.data.dataDetails);
 	const [searchTerm, setSearchTerm] = useState("");
     const [pollName, setPollName] = useState("")
-	const [postsPerPage, setPostsPerPage] = useState(8);
+	const [postsPerPage] = useState(8);
 	const [currentPage, setCurrentPage] = useState(0);
 
 	const pageNumbers = [];
@@ -60,8 +60,8 @@ function TemplatePage() {
 	}
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 	const getPageData = () => {
-		const start = currentPage * 8;
-		const end = start + 8;
+		const start = currentPage * postsPerPage;
+		const end = start + postsPerPage;
 		return dataArray.slice(start, end);
 	};
 	const handleNext = () => {
@@ -81,14 +81,12 @@ function TemplatePage() {
 	
 		dispatch(getAllData(token));
 	
-	}, [dataArray]);
+	}, [token,dispatch]);
 
-	let dataA = [];
 	useEffect(() => {
-		if (data.length !== 0) {
-			dataA = data?.userDetails?.templateCreated;
-			setDataArray(dataA.reverse());
-		
+		if (data?.userDetails?.templateCreated) {
+			const dataA = [...data.userDetails.templateCreated].reverse();
+			setDataArray(dataA);
 		}
 	}, [data]);
 
@@ -115,7 +113,7 @@ function TemplatePage() {
 
 
 useEffect(()=>{
-	if(dataById.length!==0){
+	if(dataById && dataById.length!==0){
 		const data = {
 			pollName:pollName,
 			questions: dataById?.template?.questions,
@@ -125,7 +123,7 @@ useEffect(()=>{
 	   };
 	   dispatch(postPollData(data,token))
 	}
-},[dataById])
+},[dataById,pollName,token,dispatch])
 
 
 	return (
@@ -195,17 +193,10 @@ useEffect(()=>{
 						templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
 					>
 						{getPageData()
-							.filter((val) => {
-								if (searchTerm === "") {
-									return val;
-								} else if (
-									val.templateName
-										?.toLowerCase()
-										?.includes(searchTerm?.toLowerCase())
-								) {
-									return val;
-								}
-							})
+							.filter((val) =>
+								searchTerm === "" ||
+								val.templateName?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+							)
 
 							.map((item) => (
 								<Card>
@@ -297,7 +288,7 @@ useEffect(()=>{
 						))}
 
 						<Button
-							isDisabled={currentPage >= Math.ceil(dataArray.length / 8) - 1}
+							isDisabled={currentPage >= Math.ceil(dataArray.length / postsPerPage) - 1}
 							onClick={handleNext}
 							color={"white"}
 							bgColor={"#FFC1C3"}

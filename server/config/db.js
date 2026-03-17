@@ -1,22 +1,13 @@
-const mongoose=require("mongoose");
-const firebase = require('firebase');
-
+const { Pool } = require('pg');
 require("dotenv").config();
 
-mongoose.set("strictQuery", false);
+const isLocal = process.env.DATABASE_URL.includes("localhost");
 
-const Connection= mongoose.connect(process.env.MONGO_URL);
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: isLocal ? false : {
+        rejectUnauthorized: false // Required for Neon
+    }
+});
 
-const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.Auth_Domain,
-    databaseURL:process.env.Database_URL,
-    projectId: process.env.Project_Id,
-    storageBucket: process.env.Storage_Bucket,
-    messagingSenderId: process.env.Messagin_Sender_Id,
-    appId: process.env.App_Id
-  };
-
-firebase.initializeApp(firebaseConfig);
-
-module.exports={Connection,firebase};
+module.exports = { pool };

@@ -15,7 +15,7 @@ const LiveChart = () => {
     const navigate = useNavigate()
     const toast = useToast()
 		  useEffect(() => {
-		const socket = io(`https://votek-backend-production.up.railway.app`);
+		const socket = io(`http://localhost:8080`);
 
 	
 			socket.on('pollData', (newPollData) => {
@@ -39,7 +39,7 @@ const LiveChart = () => {
 			  socket.off('pollData');
 			  socket.off('pollDeleted');
 			};
-		  }, [id]);
+		  }, [id,token,dispatch,toast,navigate]);
 
 
 
@@ -99,7 +99,7 @@ const LiveChart = () => {
 			}, 1000);
 		
 			return () => clearInterval(intervalId);
-		  }, [endTime]);
+		  }, [endTime, id, token, dispatch, toast, navigate]);
 		  
 
 

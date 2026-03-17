@@ -45,7 +45,7 @@ const RecentPolls = () => {
     setLoader(true);
     axios
       .get(
-        `https://votek-backend-production.up.railway.app/user/user-details`,
+        `http://localhost:8080/user/user-details`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`,

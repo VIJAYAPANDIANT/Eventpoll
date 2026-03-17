@@ -1,4 +1,4 @@
-import { Button, Code, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useClipboard, useDisclosure } from "@chakra-ui/react"
+import { Button, Code, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from "@chakra-ui/react"
 import { useState } from "react"
 
 function UrlModal(url) {

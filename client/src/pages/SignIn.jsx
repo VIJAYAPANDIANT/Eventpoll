@@ -16,13 +16,15 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from "axios";
 
 import { useEffect, useState } from "react";
 import validator from "validator";
 
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { signInAuth } from "../redux/auth/action";
+import { signInAuth, googleSignInAuth } from "../redux/auth/action";
 import { useSelector } from "react-redux";
 import Layout from "../components/Layout";
 
@@ -38,6 +40,53 @@ export default function SignIn() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const toast = useToast()
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        
+        // Prepare data for backend or directly for Redux
+        // Since we don't have a Google login backend endpoint yet, 
+        // we'll simulate a successful auth with the info we got.
+        const googleData = {
+          email: res.data.email,
+          fullName: res.data.name,
+          role: "user", // Default role
+          token: { primaryToken: tokenResponse.access_token }
+        };
+
+        dispatch(googleSignInAuth(googleData));
+        toast({
+          title: "Login Successful",
+          description: `Welcome back, ${res.data.name}!`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (err) {
+        console.error(err);
+        toast({
+          title: "Google Login Failed",
+          description: "Could not fetch user info from Google.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Google Login Failed",
+        description: "Login was unsuccessful. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
   const handleClick = () => {
     let emailCheck = false;
     let passCheck = false;
@@ -93,7 +142,7 @@ export default function SignIn() {
 useEffect(()=>{
   if(error?.response?.data?.msg){
     toast({
-      title: 'Wrong cridentials.',
+      title: error.response.data.msg,
       description: "Please check the email and password once.",
       status: 'error',
       duration: 9000,
@@ -190,6 +239,7 @@ useEffect(()=>{
               maxW={"md"}
               variant={"outline"}
               leftIcon={<FcGoogle />}
+              onClick={() => handleGoogleLogin()}
             >
               <Center>
                 <Text fontFamily={"Open Sans"}>Sign in with Google</Text>

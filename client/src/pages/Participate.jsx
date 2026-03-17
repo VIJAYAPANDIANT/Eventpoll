@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Flex, FormControl, Input, Button, Text } from "@chakra-ui/react";
+import { Box, Flex, FormControl, Input, Text } from "@chakra-ui/react";
 import Navbar from "../components/Navbar";
 import styles from "../styles/participate.module.css";
 import { useNavigate } from "react-router-dom";

@@ -12,7 +12,7 @@ const TemplateDetailPage = () => {
 
   const dispatch = useDispatch()
   const {id} = useParams()
-  const dataById = useSelector((store)=>store.data.dataDetails)||[]
+  const dataById = useSelector((store) => store.data.dataDetails);
   const [dataArray, setDataArray] = useState([])
   let token = localStorage.getItem("adminToken");
 
@@ -23,15 +23,12 @@ const TemplateDetailPage = () => {
   },[dispatch,id,token])
 
 
-  let dataA = []
-  useEffect(()=>{
-    if(dataById.length!==0 ){
-      dataA = dataById.template.questions
-
-      setDataArray(dataA)
-  
-  }
-  },[dataById])
+  useEffect(() => {
+    if (dataById && dataById.template) {
+      const questions = dataById.template.questions;
+      setDataArray(questions);
+    }
+  }, [dataById]);
 
 
  
@@ -40,8 +37,8 @@ const TemplateDetailPage = () => {
 
     <Box>
       <Navbar/>
-     {dataArray.map((item)=>(
-  <EditComponent item={item} />
+     {dataArray.map((item, index) => (
+       <EditComponent key={item._id || item.id || index} item={item} />
      ))}
       
    

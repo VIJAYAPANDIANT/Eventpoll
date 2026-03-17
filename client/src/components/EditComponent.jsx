@@ -29,7 +29,7 @@ const EditComponent = (props) => {
   const [currentPoll, setCurrentPoll] = useState(data);
 
   const dispatch = useDispatch()
-  const [rating, setRating] = useState(0)
+  const [, setRating] = useState(0)
   const toast = useToast()
   const { id } = useParams()
 
@@ -97,7 +97,7 @@ const EditComponent = (props) => {
 
   useEffect(() => {
     dispatch(getTemplateByIdData(id, token))
-  }, [])
+  }, [dispatch, id, token])
 
 
 

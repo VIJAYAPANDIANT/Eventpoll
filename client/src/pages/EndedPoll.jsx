@@ -29,7 +29,7 @@ function EndedPoll() {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
 
-	const [postsPerPage, setPostsPerPage] = useState(8);
+	const [postsPerPage] = useState(8);
 	const [currentPage, setCurrentPage] = useState(0);
 	const ended = useSelector((store) => store.data.ended).reverse() || [];
 	const pageNumbers = [];
@@ -38,8 +38,8 @@ function EndedPoll() {
 	}
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 	const getPageData = () => {
-		const start = currentPage * 8;
-		const end = start + 8;
+		const start = currentPage * postsPerPage;
+		const end = start + postsPerPage;
 		return ended.slice(start, end);
 	};
 	const handleNext = () => {
@@ -89,15 +89,10 @@ function EndedPoll() {
           templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
         >
           {getPageData()
-            .filter((val) => {
-              if (searchTerm === "") {
-                return val;
-              } else if (
-                val.pollName?.toLowerCase()?.includes(searchTerm?.toLowerCase())
-              ) {
-                return val;
-              }
-            })
+            .filter((val) =>
+              searchTerm === "" ||
+              val.pollName?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+            )
             .map((item) => (
               <Card borderRadius={"none"} border={"1px solid #C0C9CC"}>
                 <CardHeader>
@@ -151,7 +146,7 @@ function EndedPoll() {
           ))}
 
           <Button
-            isDisabled={currentPage >= Math.ceil(ended.length / 12) - 1}
+            isDisabled={currentPage >= Math.ceil(ended.length / postsPerPage) - 1}
             onClick={handleNext}
             color={"white"}
             bgColor={"#FFC1C3"}

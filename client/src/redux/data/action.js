@@ -254,7 +254,7 @@ export const postPollData = (data,token)=>(dispatch)=>{
 dispatch(postPollDataRequest())
     return axios({
         method:"POST",
-        url:"https://votek-backend-production.up.railway.app/firebase/create-poll",
+        url:"http://localhost:8080/firebase/create-poll",
         headers:{
           'Authorization' : `Bearer ${token}`
         },
@@ -277,7 +277,7 @@ export const addTemplateData = (data,token)=>(dispatch)=>{
 dispatch(addTemplateDataRequest())
     return axios({
         method:"POST",
-        url:"https://votek-backend-production.up.railway.app/template/save-template",
+        url:"http://localhost:8080/template/save-template",
         headers:{
           'Authorization' : `Bearer ${token}`
         },
@@ -302,7 +302,7 @@ export const getTemplateData = (token)=>(dispatch)=>{
 dispatch(getTemplateDataRequest())
     return axios({
         method:"GET",
-        url:"https://votek-backend-production.up.railway.app/user/user-details",
+        url:"http://localhost:8080/user/user-details",
         headers:{
           'Authorization' : `Bearer ${token}`
         }
@@ -324,7 +324,7 @@ export const getTemplateByIdData = (id,token)=>(dispatch)=>{
 dispatch(getTemplateByIdDataRequest())
     return axios({
         method:"GET",
-        url:`https://votek-backend-production.up.railway.app/template/get-template/${id}`,
+        url:`http://localhost:8080/template/get-template/${id}`,
         headers:{
           'Authorization' : `Bearer ${token}`
         }
@@ -347,7 +347,7 @@ export const getAllData = (token)=>(dispatch)=>{
 dispatch(getAllDataRequest())
     return axios({
         method:"GET",
-        url:"https://votek-backend-production.up.railway.app/user/user-details",
+        url:"http://localhost:8080/user/user-details",
         headers:{
           'Authorization' : `Bearer ${token}`
         }
@@ -365,7 +365,7 @@ export const getLiveData = (token)=>(dispatch)=>{
     dispatch(getLiveDataRequest())
         return axios({
             method:"GET",
-            url:"https://votek-backend-production.up.railway.app/firebase/live-polls",
+            url:"http://localhost:8080/firebase/live-polls",
             headers:{
               'Authorization' : `Bearer ${token}`
             }
@@ -389,7 +389,7 @@ export const getLiveData = (token)=>(dispatch)=>{
         dispatch(stopPollRequest())
             return axios({
                 method:"POST",
-                url:"https://votek-backend-production.up.railway.app/poll/save-poll",
+                url:"http://localhost:8080/poll/save-poll",
                 headers:{
                   'Authorization' : `Bearer ${token}`
                 },
@@ -409,7 +409,7 @@ export const getLiveData = (token)=>(dispatch)=>{
         dispatch(endedPollRequest())
             return axios({
                 method:"GET",
-                url:"https://votek-backend-production.up.railway.app/poll/ended-polls",
+                url:"http://localhost:8080/poll/ended-polls",
                 headers:{
                   'Authorization' : `Bearer ${token}`
                 }
@@ -429,7 +429,7 @@ export const getLiveData = (token)=>(dispatch)=>{
             dispatch(userVotedRequest())
                 return axios({
                     method:"POST",
-                    url:"https://votek-backend-production.up.railway.app/poll/polls/votedBy",
+                    url:"http://localhost:8080/poll/polls/votedBy",
                     headers:{
                       'Authorization' : `Bearer ${token}`,
                       'Content-Type': 'application/json'

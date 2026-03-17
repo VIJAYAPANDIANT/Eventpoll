@@ -13,7 +13,7 @@ const PollPage = () => {
   const [selections, setSelections] = useState();
   const [voteData, setVoteData] = useState();
   const [questionData, setQuesData] = useState([]);
-  const [pollDetail, setPollDetail] = useState([]);
+  const [, setPollDetail] = useState([]);
   const { id } = useParams();
   const [loader, setLoader] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
@@ -69,58 +69,61 @@ const PollPage = () => {
   useEffect(() => {
     if (selections) {
       const { question, questionId, selectedAns, options } = selections;
-      const existingQuestionIndex = pollDetail.findIndex(
-        (q) => q.questionId === questionId
-      );
-      if (existingQuestionIndex === -1) {
-        // add new question to array
-        setPollDetail([
-          ...pollDetail,
-          { question, questionId, selectedAns, options },
-        ]);
-      } else {
-        // update options ids for existing question
-        const updatedQuestion = {
-          ...pollDetail[existingQuestionIndex],
-          selectedAns,
-        };
-        const updatedPollDetail = [...pollDetail];
-        updatedPollDetail[existingQuestionIndex] = updatedQuestion;
-        setPollDetail(updatedPollDetail);
-      }
 
-      const payload = {
-        pollData: pollDetail,
-        pollId: pollData?.pollId,
-        pollName: pollData?.pollName,
-        selectedAnswers: questionData,
-      };
-      setVoteData(payload);
+      setPollDetail((prevPollDetail) => {
+        const existingQuestionIndex = prevPollDetail.findIndex(
+          (q) => q.questionId === questionId
+        );
+        let updatedPollDetail;
+        if (existingQuestionIndex === -1) {
+          // add new question to array
+          updatedPollDetail = [...prevPollDetail, { question, questionId, selectedAns, options }];
+        } else {
+          // update options ids for existing question
+          updatedPollDetail = [...prevPollDetail];
+          updatedPollDetail[existingQuestionIndex] = {
+            ...updatedPollDetail[existingQuestionIndex],
+            selectedAns,
+          };
+        }
+        
+        // Update voteData using the latest pollDetail and questionData
+        setVoteData({
+          pollData: updatedPollDetail,
+          pollId: pollData?.pollId,
+          pollName: pollData?.pollName,
+          selectedAnswers: questionData,
+        });
+
+        return updatedPollDetail;
+      });
     }
-  }, [selections, questionData]);
+  }, [selections, questionData, pollData?.pollId, pollData?.pollName]);
 
   //  For adding the selected answers array to questionData
 
   useEffect(() => {
     if (selections) {
       const { questionId, selectedAns } = selections;
-      const existingQuestion = questionData.find(
-        (q) => q.questionId === questionId
-      );
-      if (existingQuestion) {
-        // update options ids for existing question
-        const updatedQuestion = {
-          ...existingQuestion,
-          optionsIds: selectedAns,
-        };
-        setQuesData([
-          ...questionData.filter((q) => q.questionId !== questionId),
-          updatedQuestion,
-        ]);
-      } else {
-        // add new question to array
-        setQuesData([...questionData, { questionId, optionsIds: selectedAns }]);
-      }
+      setQuesData((prevQuestionData) => {
+        const existingQuestion = prevQuestionData.find(
+          (q) => q.questionId === questionId
+        );
+        if (existingQuestion) {
+          // update options ids for existing question
+          const updatedQuestion = {
+            ...existingQuestion,
+            optionsIds: selectedAns,
+          };
+          return [
+            ...prevQuestionData.filter((q) => q.questionId !== questionId),
+            updatedQuestion,
+          ];
+        } else {
+          // add new question to array
+          return [...prevQuestionData, { questionId, optionsIds: selectedAns }];
+        }
+      });
     }
   }, [selections]);
 
@@ -142,7 +145,7 @@ const PollPage = () => {
         setStatus(err?.response?.status);
         setLoader(false);
       });
-  }, [userToken]);
+  }, [userToken,id]);
 
   return (
     <>
