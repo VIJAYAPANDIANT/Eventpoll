@@ -33,7 +33,7 @@ const PollPage = () => {
     setSubmitting(true);
     axios({
       method: "POST",
-      url: "http://localhost:8080/firebase/vote",
+      url: "/api/firebase/vote",
       headers: {
         Authorization: `Bearer ${userToken}`,
       },
@@ -132,7 +132,7 @@ const PollPage = () => {
   useEffect(() => {
     setLoader(true);
     axios
-      .get(`http://localhost:8080/firebase/live-poll/${id}`, {
+      .get(`/api/firebase/live-poll/${id}`, {
         headers: {
           Authorization: userToken,
         },

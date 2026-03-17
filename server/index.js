@@ -24,10 +24,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJsDocs));
-app.use("/user", userController);
-app.use("/auth", authController);
-app.use("/poll",pollController);
-app.use("/template",templateController);
+app.use("/api/user", userController);
+app.use("/api/auth", authController);
+app.use("/api/poll",pollController);
+app.use("/api/template",templateController);
 
 // ---------------Socket.io setup to get live changes ------->
 const io = new Server({

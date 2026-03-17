@@ -15,7 +15,7 @@ const LiveChart = () => {
     const navigate = useNavigate()
     const toast = useToast()
 		  useEffect(() => {
-		const socket = io(`http://localhost:8080`);
+		const socket = io(`/api`);
 
 	
 			socket.on('pollData', (newPollData) => {

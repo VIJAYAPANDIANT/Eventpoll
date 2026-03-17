@@ -62,7 +62,7 @@ export const signInAuth = (data)=>(dispatch)=>{
 dispatch(signInAuthRequest())
     return axios({
         method:"POST",
-        url:"http://localhost:8080/auth/signin",
+        url:"/api/auth/signin",
         data
     })
     .then((res)=>{
@@ -93,7 +93,7 @@ export const signUp = (data)=>(dispatch)=>{
     dispatch(signUpRequest())
         return axios({
             method:"POST",
-            url:"http://localhost:8080/user/signup",
+            url:"/api/user/signup",
             data
         })
         .then((res)=>{

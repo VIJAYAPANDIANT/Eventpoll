@@ -45,7 +45,7 @@ const RecentPolls = () => {
     setLoader(true);
     axios
       .get(
-        `http://localhost:8080/user/user-details`,
+        `/api/user/user-details`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`,
