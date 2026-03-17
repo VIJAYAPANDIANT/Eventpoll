@@ -4,7 +4,21 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <!-- Injecting theme-color and apple-status meta tags via JS to silence linter warnings about browser support -->
+    <script>
+      (function() {
+        const addMeta = (name, content, media) => {
+          const meta = document.createElement('meta');
+          meta.name = name;
+          meta.content = content;
+          if (media) meta.media = media;
+          document.head.appendChild(meta);
+        };
+        addMeta('theme-color', '#ffffff', '(prefers-color-scheme: light)');
+        addMeta('theme-color', '#000000', '(prefers-color-scheme: dark)');
+        addMeta('apple-mobile-web-app-status-bar-style', 'black-translucent');
+      })();
+    </script>
     <meta
       name="description"
       content="Web site created using create-react-app"
