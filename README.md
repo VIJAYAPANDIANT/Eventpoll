@@ -1,6 +1,7 @@
 # Votek - High-Performance Real-Time Voting Application
 
 ### 📝 Brief Overview
+
 **Votek** is a modern, full-stack polling and voting application designed for real-time interaction and dynamic result tracking. Built as a monorepo, it leverages a robust React frontend and a scalable Express backend to provide a seamless user experience for creating, participating in, and analyzing polls.
 
 ---
@@ -8,9 +9,11 @@
 ### 🔍 Detailed Explanation
 
 #### 🏗️ Architecture & Core Philosophy
+
 Votek is designed with a **Monorepo** architecture, using **NPM Workspaces** to manage both the `client` and `server` within a single repository. This ensures atomic updates, unified dependency management, and a simplified development workflow.
 
 #### ⚡ Key Features
+
 - **Real-Time Live Updates**: Utilizing **Socket.io**, the platform provides instant feedback. When a vote is cast, it reflects immediately on the results chart for all users without a page refresh.
 - **Dynamic Data Visualization**: Powered by **Chart.js** and **React-Chartjs-2**, poll results are presented in stunning, interactive charts.
 - **Secure Authentication**: Implementation of **JWT (JSON Web Tokens)** for session management and **Bcryptjs** for secure password hashing. It also features **Google OAuth** integration for quick access.
@@ -19,6 +22,7 @@ Votek is designed with a **Monorepo** architecture, using **NPM Workspaces** to 
 - **API Documentation**: Integrated **Swagger** UI provides a live, interactive playground for testing backend endpoints.
 
 #### 🛠️ Technology Stack
+
 | Layer | Technologies |
 | :--- | :--- |
 | **Frontend** | React, Redux, Chakra UI, Framer Motion, Axios, Socket.io-client, Chart.js |
@@ -31,11 +35,13 @@ Votek is designed with a **Monorepo** architecture, using **NPM Workspaces** to 
 ### 🚀 Getting Started
 
 #### Prerequisites
+
 - **Node.js**: v16 or higher
 - **NPM**: v7 or higher (for workspace support)
 - **Database**: PostgreSQL (e.g., Neon.tech) and a Firebase project if using real-time features.
 
 #### Installation & Setup
+
 1. **Clone the repository**:
    ```bash
    git clone <repository-url>
@@ -59,6 +65,7 @@ Votek is designed with a **Monorepo** architecture, using **NPM Workspaces** to 
 ---
 
 ### ☁️ Deployment
+
 This project is configured for one-click deployment to **Vercel**.
 - The root includes a `vercel.json` and a `build` script that automatically handles the monorepo routing and static build process.
 - All API requests are automatically routed to the Node.js server via the `/api` prefix.
