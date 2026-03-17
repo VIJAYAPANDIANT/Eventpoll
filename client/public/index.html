@@ -7,8 +7,8 @@
     <!-- Injecting theme-color and apple-status meta tags via JS to silence linter warnings about browser support -->
     <script>
       (function() {
-        const addMeta = (name, content, media) => {
-          const meta = document.createElement('meta');
+        var addMeta = function(name, content, media) {
+          var meta = document.createElement('meta');
           meta.name = name;
           meta.content = content;
           if (media) meta.media = media;
