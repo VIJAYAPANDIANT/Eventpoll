@@ -17,8 +17,11 @@
       "destination": "server/index.js"
     },
     {
-      "source": "/((?!api/).*)",
-      "destination": "client/index.html"
+      "handle": "filesystem"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
