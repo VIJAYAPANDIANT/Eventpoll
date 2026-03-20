@@ -36,7 +36,6 @@ const PollPage = () => {
   const pageBg = useColorModeValue("#f8fafc", "black");
   const textColor = useColorModeValue("gray.900", "white");
   const subTextColor = useColorModeValue("gray.500", "gray.300");
-  const cardBg = useColorModeValue("white", "gray.800");
   const badgeVariant = useColorModeValue("subtle", "solid");
 
   const handleSelectionChange = (selectedOptions) => {
