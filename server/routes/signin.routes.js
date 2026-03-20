@@ -10,6 +10,44 @@ const {
 
 //<-------------------------------   APT for sign in   ------------------------------->
 
+authController.post("/google-signin", async (req, res) => {
+  const { email, fullName } = req.body;
+  const role = "user";
+
+  try {
+    let { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    let user;
+    if (rows.length === 0) {
+      // Create new user for first-time Google sign-in
+      const { rows: insertedRows } = await pool.query(
+        'INSERT INTO users (email, fullName, password, userRole, pollsCreated, templateCreated, pollsAttended) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [email, fullName, "google-auth-no-password", role, JSON.stringify([]), JSON.stringify([]), JSON.stringify([])]
+      );
+      user = insertedRows[0];
+    } else {
+      user = rows[0];
+    }
+
+    const token = generateToken({
+      userId: user.id,
+      email: user.email,
+      fullName: user.fullname,
+      role: user.userrole,
+    });
+
+    res.status(200).send({
+      msg: "Signed in with Google successfully",
+      email: user.email,
+      fullName: user.fullname,
+      role: user.userrole,
+      token,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).send({ msg: "Google Signin sync failed" });
+  }
+});
+
 authController.post("/signin", async (req, res) => {
   const { email, password } = req.body;
   const validEmail = validateEmail(email);

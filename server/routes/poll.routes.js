@@ -6,15 +6,16 @@ const { votedByData, decryptToken, pollToArray } = require("../utils/utils");
 
 // <----------------------------// API for storing ended poll into PostgreSQL----------------->
 pollController.post("/save-poll", async (req, res) => {
-    const { pollId, adminId, pollName, templateName, questions, usersAttended, pollCreatedAt, pollEndsAt } = req.body;
+    const { pollId, adminId, pollName, topic, templateName, questions, usersAttended, pollCreatedAt, pollEndsAt } = req.body;
 
     try {
         await pool.query(
-            'INSERT INTO polls (pollId, adminId, pollName, templateName, questions, pollStatus, usersAttended, pollCreatedAt, pollEndsAt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+            'INSERT INTO polls (pollId, adminId, pollName, topic, templateName, questions, pollStatus, usersAttended, pollCreatedAt, pollEndsAt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
             [
                 pollId,
                 adminId,
                 pollName,
+                topic,
                 templateName,
                 JSON.stringify(questions),
                 false,
@@ -46,8 +47,8 @@ pollController.get('/ended-polls', async (req, res) => {
             const user = userRows[0];
             const userRole = user.userrole;
 
-            if (userRole !== "admin") {
-                res.status(403).send("Only admin is allowed to see a poll")
+            if (userRole !== "admin" && userRole !== "user") {
+                res.status(403).send("Please login to see your polls")
             }
             else {
                 const adminId = user.id;

@@ -261,8 +261,8 @@ dispatch(postPollDataRequest())
         data
     })
     .then((res)=>{
-   
-        dispatch(postPollDataRequest());
+        dispatch(postPollDataSuccess());
+        return res;
     })
     .catch((error)=>{
      dispatch(postPollDataFailure(error))
@@ -286,6 +286,7 @@ dispatch(addTemplateDataRequest())
     .then((res)=>{
 
         dispatch(addTemplateDataSuccess());
+        return res;
     })
     .catch((error)=>{
      dispatch(addTemplateDataFailure(error))

@@ -1,8 +1,6 @@
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import { FcGoogle } from 'react-icons/fc';
 import {
     Button,
-    Center,
     Checkbox,
     Flex,
     FormControl,
@@ -16,14 +14,12 @@ import {
     Text,
     useToast
   } from '@chakra-ui/react';
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
   
 import { useEffect, useState } from 'react';
 import validator from 'validator';
 import Layout from '../components/Layout';
 import { useDispatch } from 'react-redux';
-import { signUp, googleSignInAuth } from '../redux/auth/action';
+import { signUp } from '../redux/auth/action';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,49 +37,6 @@ import { useNavigate } from 'react-router-dom';
     const toast = useToast()
     const error = useSelector((store) => store.auth.error);
     
-    const handleGoogleLogin = useGoogleLogin({
-      onSuccess: async (tokenResponse) => {
-        try {
-          const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
-            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-          });
-          
-          const googleData = {
-            email: res.data.email,
-            fullName: res.data.name,
-            role: "user",
-            token: { primaryToken: tokenResponse.access_token }
-          };
-  
-          dispatch(googleSignInAuth(googleData));
-          toast({
-            title: "Login Successful",
-            description: `Welcome back, ${res.data.name}!`,
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-        } catch (err) {
-          console.error(err);
-          toast({
-            title: "Google Login Failed",
-            description: "Could not fetch user info from Google.",
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-      },
-      onError: () => {
-        toast({
-          title: "Google Login Failed",
-          description: "Login was unsuccessful. Please try again.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      },
-    });
 
 const handleClick = ()=>{
   
@@ -214,18 +167,6 @@ if(error?.response?.data?.msg){
               </Stack>
               <Button fontFamily={"Open Sans"} color={'white'} bg={'red.400'} onClick={handleClick} variant={'solid'}>
                 Sign up
-              </Button>
-              <Text fontFamily={"Open Sans"}>OR</Text>
-              <Button
-                w={'full'}
-                maxW={'md'}
-                variant={'outline'}
-                leftIcon={<FcGoogle />}
-                onClick={() => handleGoogleLogin()}
-              >
-                <Center>
-                  <Text fontFamily={"Open Sans"}>Sign in with Google</Text>
-                </Center>
               </Button>
             </Stack>
             <Text fontFamily={"Open Sans"} align={'center'}>

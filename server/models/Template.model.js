@@ -12,6 +12,8 @@ const questionSchema= new mongoose.Schema({
 const templateSchema = new mongoose.Schema({
     adminId : {type : String},
     templateName:{type:String},
+    topic:{type:String},
+    topicImage:{type:String},
     questions: [questionSchema],
 });
 

@@ -1,10 +1,23 @@
 import React, { useEffect, useState } from "react";
-import styles from "../styles/pollpage.module.css";
-import { Box, Button, Flex, Text, Spinner, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Text,
+  Spinner,
+  useToast,
+  Container,
+  VStack,
+  Heading,
+  Icon,
+  Badge,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import axios from "axios";
 import QuestionCard from "../components/QuestionCard";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { BiErrorCircle } from "react-icons/bi";
 
 const PollPage = () => {
   const [pollData, setPollData] = useState("");
@@ -20,16 +33,22 @@ const PollPage = () => {
   const toast = useToast();
   const [statusCode, setStatus] = useState("");
 
-  // A parent function for retrieving the Payload from child component(Question.jsx)
+  const pageBg = useColorModeValue("#f8fafc", "black");
+  const textColor = useColorModeValue("gray.900", "white");
+  const subTextColor = useColorModeValue("gray.500", "gray.300");
+  const cardBg = useColorModeValue("white", "gray.800");
+  const badgeVariant = useColorModeValue("subtle", "solid");
 
   const handleSelectionChange = (selectedOptions) => {
     setSelections(selectedOptions);
   };
 
-  //  An onSubmit function for adding the new vote
-
   const vote = (e) => {
     e.preventDefault();
+    if (!userToken) {
+      toast({ title: "Authentication required", description: "Please sign in to vote.", status: "warning", duration: 3000 });
+      return;
+    }
     setSubmitting(true);
     axios({
       method: "POST",
@@ -42,92 +61,54 @@ const PollPage = () => {
       .then((res) => {
         setSubmitting(false);
         if (res?.status === 200) {
-          toast({
-            title: "YaY, You did it.👍",
-            description: "We've collected your opinon.😋",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-          });
+          toast({ title: "Vote Cast! 👍", description: "Your opinion has been recorded.", status: "success", duration: 5000 });
         } else if (res?.status === 208) {
-          toast({
-            title: "You've allready voted.👍",
-            description: "We've allready collected your opinon.😋",
-            status: "warning",
-            duration: 5000,
-            isClosable: true,
-          });
+          toast({ title: "Already Voted", description: "You have already cast your vote for this poll.", status: "info", duration: 5000 });
         }
       })
       .catch((error) => {
         setSubmitting(false);
+        toast({ title: "Error", description: "Failed to submit vote. Please try again.", status: "error", duration: 3000 });
       });
   };
-
-  //  for setting the payload and pushing set into voteData
 
   useEffect(() => {
     if (selections) {
       const { question, questionId, selectedAns, options } = selections;
-
       setPollDetail((prevPollDetail) => {
-        const existingQuestionIndex = prevPollDetail.findIndex(
-          (q) => q.questionId === questionId
-        );
+        const existingQuestionIndex = prevPollDetail.findIndex((q) => q.questionId === questionId);
         let updatedPollDetail;
         if (existingQuestionIndex === -1) {
-          // add new question to array
           updatedPollDetail = [...prevPollDetail, { question, questionId, selectedAns, options }];
         } else {
-          // update options ids for existing question
           updatedPollDetail = [...prevPollDetail];
-          updatedPollDetail[existingQuestionIndex] = {
-            ...updatedPollDetail[existingQuestionIndex],
-            selectedAns,
-          };
+          updatedPollDetail[existingQuestionIndex] = { ...updatedPollDetail[existingQuestionIndex], selectedAns };
         }
-        
-        // Update voteData using the latest pollDetail and questionData
         setVoteData({
           pollData: updatedPollDetail,
           pollId: pollData?.pollId,
           pollName: pollData?.pollName,
           selectedAnswers: questionData,
         });
-
         return updatedPollDetail;
       });
     }
   }, [selections, questionData, pollData?.pollId, pollData?.pollName]);
 
-  //  For adding the selected answers array to questionData
-
   useEffect(() => {
     if (selections) {
       const { questionId, selectedAns } = selections;
       setQuesData((prevQuestionData) => {
-        const existingQuestion = prevQuestionData.find(
-          (q) => q.questionId === questionId
-        );
+        const existingQuestion = prevQuestionData.find((q) => q.questionId === questionId);
         if (existingQuestion) {
-          // update options ids for existing question
-          const updatedQuestion = {
-            ...existingQuestion,
-            optionsIds: selectedAns,
-          };
-          return [
-            ...prevQuestionData.filter((q) => q.questionId !== questionId),
-            updatedQuestion,
-          ];
+          const updatedQuestion = { ...existingQuestion, optionsIds: selectedAns };
+          return [...prevQuestionData.filter((q) => q.questionId !== questionId), updatedQuestion];
         } else {
-          // add new question to array
           return [...prevQuestionData, { questionId, optionsIds: selectedAns }];
         }
       });
     }
   }, [selections]);
-
-  //  For fetching the live poll for perticular user by userId
 
   useEffect(() => {
     setLoader(true);
@@ -145,81 +126,82 @@ const PollPage = () => {
         setStatus(err?.response?.status);
         setLoader(false);
       });
-  }, [userToken,id]);
+  }, [userToken, id]);
 
   return (
-    <>
+    <Box bg={pageBg} minH="100vh" color={textColor}>
       <Navbar />
-      {statusCode === 404 ? (
-        <Flex
-          p={20}
-          fontFamily={"Open Sans"}
-          flexDir={"column"}
-          justify={"center"}
-          align={"center"}
-          h="90vh"
-        >
-          <Box className={styles.errorPng}></Box>
-          <Text fontFamily={"Poppins"} color={"#D71A20"} fontSize={"22px"}>
-            Invalid Link
-          </Text>
-          <Text
-            fontSize={{ base: "10px", md: "20px" }}
-            color={"rgb(22, 26, 26)"}
-          >
-            Either you can check the link or the poll has been ended
-          </Text>
-        </Flex>
-      ) : (
-        <Box>
-          {loader ? (
-            <Box className={styles.loaderContainer}>
-              <Spinner
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="#FFC1C3"
-                color="#D71A20"
-                size="xl"
-              />
+      
+      <Container maxW="container.md" py={12}>
+        {statusCode === 404 ? (
+          <Flex direction="column" align="center" justify="center" py={20} textAlign="center">
+            <Icon as={BiErrorCircle} w={20} h={20} color="red.400" mb={6} />
+            <Heading size="xl" mb={4} color={textColor}>Invalid Link</Heading>
+            <Text color={subTextColor} fontSize="lg">
+              Either the link is incorrect or the poll has already ended.
+            </Text>
+            <Button mt={8} onClick={() => window.location.href = '/'} variant="outline" borderColor="#D71A20" color="#D71A20">
+              Go Home
+            </Button>
+          </Flex>
+        ) : loader ? (
+          <Flex h="60vh" align="center" justify="center">
+            <Spinner thickness="4px" speed="0.65s" emptyColor="gray.100" color="#D71A20" size="xl" />
+          </Flex>
+        ) : (
+          <VStack spacing={8} align="stretch">
+            <Box textAlign="center" mb={4}>
+              <Badge colorScheme="red" variant="solid" borderRadius="full" px={4} py={1} mb={4} textTransform="uppercase" letterSpacing="widest">
+                Active Poll
+              </Badge>
+              <Heading size="2xl" fontWeight="900" color={textColor}>
+                {pollName}
+              </Heading>
+              {pollData?.topic && (
+                <Badge mt={3} colorScheme="gray" variant={badgeVariant} borderRadius="full" px={3} textTransform="none">
+                  Topic: {pollData.topic}
+                </Badge>
+              )}
+              <Text color={subTextColor} mt={4} fontSize="lg">
+                Please cast your vote below. Your input is valuable!
+              </Text>
             </Box>
-          ) : (
-            <Box className={styles.container}>
-              <Text className={styles.heading}>{pollName}</Text>
 
-              <Box className={styles.pollContainer}>
-                <form onSubmit={vote}>
-                  <Box className={styles.questionCont}>
-                    {questions?.length &&
-                      questions.map((e, index) => {
-                        return (
-                          <QuestionCard
-                            key={index}
-                            {...e}
-                            index={index}
-                            onSelectionChange={handleSelectionChange}
-                          />
-                        );
-                      })}
-                  </Box>
-                  <Flex mt={"20px"} justifyContent={"flex-end"}>
-                    <Button
-                      bg={"#D71A20"}
-                      color={"white"}
-                      fontWeight={400}
-                      type="submit"
-                      isLoading={isSubmitting}
-                      loadingText="Submitting"
-                    >
-                      Submit
-                    </Button>
-                  </Flex>
-                </form>
-              </Box>
-            </Box>
-          )}
-        </Box>
-      )}
-    </>
+            <form onSubmit={vote}>
+              <VStack spacing={6} align="stretch">
+                {questions?.map((q, index) => (
+                  <QuestionCard
+                    key={index}
+                    {...q}
+                    index={index}
+                    onSelectionChange={handleSelectionChange}
+                  />
+                ))}
+                
+                <Button
+                  type="submit"
+                  size="xl"
+                  w="100%"
+                  h="70px"
+                  bg="#D71A20"
+                  color="white"
+                  fontSize="xl"
+                  fontWeight="800"
+                  isLoading={isSubmitting}
+                  loadingText="Submitting Your Vote..."
+                  _hover={{ bg: "#b5161b", transform: "translateY(-2px)", boxShadow: "xl" }}
+                  _active={{ transform: "translateY(0)" }}
+                  borderRadius="2xl"
+                  mt={4}
+                >
+                  Submit My Vote
+                </Button>
+              </VStack>
+            </form>
+          </VStack>
+        )}
+      </Container>
+    </Box>
   );
 };
 

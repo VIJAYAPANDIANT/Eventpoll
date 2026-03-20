@@ -4,8 +4,9 @@ const {userController}= require("./routes/user.routes")
 const { pool } = require("./config/db");
 const authController=require("./routes/signin.routes");
 const {convertPollData}= require("./utils/utils");
-const {pollController}=require("./routes/poll.routes");;
+const {pollController}=require("./routes/poll.routes");
 const {templateController}=require("./routes/template.routes")
+const {firebaseController}=require("./routes/poll.firebase.routes")
 const app = express();
 const PORT = process.env.PORT || 8080;
 const http = require('http');
@@ -28,6 +29,7 @@ app.use("/api/user", userController);
 app.use("/api/auth", authController);
 app.use("/api/poll",pollController);
 app.use("/api/template",templateController);
+app.use("/api/firebase",firebaseController);
 
 // ---------------Socket.io setup to get live changes ------->
 const io = new Server({
@@ -51,12 +53,15 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 io.attach(server);
 
 server.listen(PORT, async () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  
   try {
     const client = await pool.connect();
-    console.log("Server is connected to PostgreSQL (Neon) database");
+    console.log("✅ Database Connected: Successfully established connection to PostgreSQL");
     client.release();
-    console.log(`server is running on ${PORT}`);
   } catch (err) {
-    console.error("Database connection failed:", err);
+    console.error("❌ Database Connection Failed!");
+    console.error("Reason:", err.message);
+    console.log("Tip: Check your DATABASE_URL in the .env file.");
   }
 });

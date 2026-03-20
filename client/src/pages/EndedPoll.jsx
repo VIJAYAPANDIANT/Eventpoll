@@ -49,7 +49,8 @@ function EndedPoll() {
 		setCurrentPage(currentPage - 1);
 	};
 
-  let token = localStorage.getItem("adminToken");
+  const authData = useSelector((store) => store.auth.auth.token);
+  const token = authData?.primaryToken || localStorage.getItem("adminToken") || localStorage.getItem("userToken");
 
   useEffect(() => {
     dispatch(endedPoll(token));

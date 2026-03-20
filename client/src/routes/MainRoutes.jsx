@@ -26,19 +26,19 @@ function MainRoutes() {
       <Route path="/signup" element={<SignUp />} />
       <Route element={<UserPrivateRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/create" element={<CreatePoll />} />
+        <Route path="/template-page" element={<TemplatePage />} />
+        <Route path="/template-page/:id" element={<TemplateDetailPage />} />
+        <Route path="/live-polls" element={<LivePoll />} />
+        <Route path="/live-polls/:id" element={<LiveChart />} />
+        <Route path="/ended-polls" element={<EndedPoll />} />
+        <Route path="/ended-polls/:id" element={<EndedChart />} />
         <Route path="/user/recentpolls" element={<RecentPolls />} />
         <Route path="/event/:id" element={<PollPage />} />
         <Route path="/user/participate" element={<Participate />} />
       </Route>
       <Route element={<AdminPrivateRoute />}>
-        <Route path="/create" element={<CreatePoll />} />
-        <Route path="/template-page" element={<TemplatePage />} />
-        <Route path="/template-page/:id" element={<TemplateDetailPage />} />
-        <Route path="/live-polls" element={<LivePoll />} />
         <Route path="/user-voted" element={<UserVoted />} />
-        <Route path="/live-polls/:id" element={<LiveChart />} />
-        <Route path="/ended-polls" element={<EndedPoll />} />
-        <Route path="/ended-polls/:id" element={<EndedChart />} />
       </Route>
     </Routes>
   );

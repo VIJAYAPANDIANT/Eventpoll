@@ -45,6 +45,20 @@
     <title>React App</title>
   </head>
   <body>
+    <!-- Chakra UI ColorModeScript to prevent theme flashing -->
+    <script>
+      (function() {
+        try {
+          var mode = localStorage.getItem('chakra-ui-color-mode');
+          if (!mode) {
+            localStorage.setItem('chakra-ui-color-mode', 'light');
+            mode = 'light';
+          }
+          document.documentElement.setAttribute('data-theme', mode);
+          document.documentElement.style.colorScheme = mode;
+        } catch (e) {}
+      })();
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--

@@ -25,6 +25,7 @@ const pollSchema = new mongoose.Schema({
     pollId : {type : String},
     adminId : {type : String},
     pollName:{type:String},
+    topic:{type:String},
     templateName:{type:String},
     questions: [questionSchema],
     pollStatus : {type : Boolean},

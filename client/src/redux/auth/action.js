@@ -104,22 +104,8 @@ export const signUp = (data)=>(dispatch)=>{
             localStorage.setItem("userName",res.data.fullName);
             localStorage.setItem("userEmail",res.data.email);
         })
-        .catch((error)=>{
-         dispatch(signUpFailure(error))
-        })
-    } 
-
-export const googleSignInAuth = (tokenData) => (dispatch) => {
-    dispatch(signInAuthSuccess(tokenData));
-
-    if (tokenData.role !== "admin") {
-        localStorage.setItem("userToken", tokenData.token.primaryToken);
-        localStorage.setItem("userName", tokenData.fullName);
-        localStorage.setItem("userEmail", tokenData.email);
-    } else {
-        localStorage.setItem("adminToken", tokenData.token.primaryToken);
-        localStorage.setItem("userName", "Admin");
-        localStorage.setItem("adminEmail", tokenData.email);
-    }
-};
+         .catch((error)=>{
+          dispatch(signUpFailure(error))
+         })
+     } 
 

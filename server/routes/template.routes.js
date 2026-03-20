@@ -10,11 +10,11 @@ templateController.post("/save-template", async (req, res) => {
     }
     const token = req.headers.authorization.split(" ")[1]
     const user = decryptToken(token);
-    const { templateName, questions } = req.body;
+    const { templateName, topic, topicImage, questions } = req.body;
     try {
         const { rows } = await pool.query(
-            'INSERT INTO templates (adminId, templateName, questions) VALUES ($1, $2, $3) RETURNING id',
-            [user.userId, templateName, JSON.stringify(questions)]
+            'INSERT INTO templates (adminId, templateName, topic, topicImage, questions) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [user.userId, templateName, topic || "General", topicImage || "", JSON.stringify(questions)]
         );
         const templateId = rows[0].id;
 
@@ -22,7 +22,7 @@ templateController.post("/save-template", async (req, res) => {
         const { rows: userRows } = await pool.query('SELECT templateCreated FROM users WHERE id = $1', [user.userId]);
         if (userRows.length > 0) {
             let templateCreated = userRows[0].templatecreated;
-            templateCreated.push({ templateId, templateName });
+            templateCreated.push({ templateId, templateName, topic: topic || "General", topicImage: topicImage || "" });
 
             await pool.query('UPDATE users SET templateCreated = $1 WHERE id = $2', [JSON.stringify(templateCreated), user.userId]);
         }
@@ -53,6 +53,8 @@ templateController.get("/get-template/:templateId", async (req, res) => {
                     template: {
                         ...template,
                         templateName: template.templatename,
+                        topic: template.topic,
+                        topicImage: template.topicimage,
                         adminId: template.adminid,
                         questions: template.questions
                     }

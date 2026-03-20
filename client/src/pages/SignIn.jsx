@@ -1,8 +1,6 @@
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { FcGoogle } from "react-icons/fc";
 import {
   Button,
-  Center,
   Checkbox,
   Flex,
   FormControl,
@@ -16,21 +14,18 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from "axios";
 
 import { useEffect, useState } from "react";
 import validator from "validator";
 
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { signInAuth, googleSignInAuth } from "../redux/auth/action";
+import { signInAuth } from "../redux/auth/action";
 import { useSelector } from "react-redux";
 import Layout from "../components/Layout";
 
 export default function SignIn() {
-  const data = useSelector((store) => store.auth.auth);
-  const error = useSelector((store) => store.auth.error);
+  const { auth: data, isLoading, error } = useSelector((store) => store.auth);
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -41,52 +36,6 @@ export default function SignIn() {
   const [passwordError, setPasswordError] = useState("");
   const toast = useToast()
 
-  const handleGoogleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        });
-        
-        // Prepare data for backend or directly for Redux
-        // Since we don't have a Google login backend endpoint yet, 
-        // we'll simulate a successful auth with the info we got.
-        const googleData = {
-          email: res.data.email,
-          fullName: res.data.name,
-          role: "user", // Default role
-          token: { primaryToken: tokenResponse.access_token }
-        };
-
-        dispatch(googleSignInAuth(googleData));
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${res.data.name}!`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      } catch (err) {
-        console.error(err);
-        toast({
-          title: "Google Login Failed",
-          description: "Could not fetch user info from Google.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-    onError: () => {
-      toast({
-        title: "Google Login Failed",
-        description: "Login was unsuccessful. Please try again.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    },
-  });
   const handleClick = () => {
     let emailCheck = false;
     let passCheck = false;
@@ -143,12 +92,20 @@ useEffect(()=>{
   if(error?.response?.data?.msg){
     toast({
       title: error.response.data.msg,
-      description: "Please check the email and password once.",
+      description: error.response.status === 500 ? "The database connection might be down. Please try again later." : "Please check the email and password once.",
       status: 'error',
-      duration: 9000,
+      duration: 5000,
       isClosable: true,
     })
-}
+  } else if (error && !error.response) {
+    toast({
+      title: "Network Error",
+      description: "Could not connect to the server. Please check your internet or if the server is running.",
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    })
+  }
 },[error,toast])
 
 
@@ -230,20 +187,11 @@ useEffect(()=>{
               bg={"red.400"}
               onClick={handleClick}
               variant={"solid"}
+              isLoading={isLoading}
+              loadingText="Signing in..."
+              _hover={{ bg: "red.500" }}
             >
               Sign in
-            </Button>
-            <Text fontFamily={"Open Sans"}>OR</Text>
-            <Button
-              w={"full"}
-              maxW={"md"}
-              variant={"outline"}
-              leftIcon={<FcGoogle />}
-              onClick={() => handleGoogleLogin()}
-            >
-              <Center>
-                <Text fontFamily={"Open Sans"}>Sign in with Google</Text>
-              </Center>
             </Button>
           </Stack>
           <Text align={"center"} fontFamily={"Open Sans"}>

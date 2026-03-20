@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS templates (
     id SERIAL PRIMARY KEY,
     adminId VARCHAR(255),
     templateName VARCHAR(255),
+    topic VARCHAR(255),
+    topicImage TEXT,
     questions JSONB DEFAULT '[]'
 );
 
@@ -23,6 +25,8 @@ CREATE TABLE IF NOT EXISTS polls (
     pollId VARCHAR(255) UNIQUE,
     adminId VARCHAR(255),
     pollName VARCHAR(255),
+    topic VARCHAR(255),
+    topicImage TEXT,
     templateName VARCHAR(255),
     questions JSONB DEFAULT '[]',
     pollStatus BOOLEAN DEFAULT TRUE,

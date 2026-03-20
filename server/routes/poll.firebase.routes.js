@@ -2,8 +2,8 @@
 const { Router } = require("express");
 const firebaseController = Router();
 const {firebase} = require('../config/db');
+const { pool } = require("../config/db");
 const { pollDataToUser,decryptToken, pollToArray} = require("../utils/utils");
-const {UserModel} = require("../models/User.model")
 const fireDb = firebase.database(); 
 const bodyParser = require('body-parser');
 const express = require("express")
@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 firebaseController.post("/create-poll", async (req, res) => {
-  const { pollName, questions, pollStatus, pollCreatedAt, pollEndsAt } =
+  const { pollName, topic, topicImage, questions, pollStatus, pollCreatedAt, pollEndsAt } =
     req.body;
 
   if (!req.headers.authorization) {
@@ -22,48 +22,78 @@ firebaseController.post("/create-poll", async (req, res) => {
     const pollId = pollRef.key;
     const token = req.headers.authorization.split(" ")[1];
     const userToken = decryptToken(token);
-    const user = await UserModel.find({ email: userToken.email });
-    const userRole = user[0].userRole;
-    if (userRole !== "admin") {
-      res.send("Only admin is allowed to create a poll");
+    
+    const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [userToken.email]);
+    if (rows.length === 0) {
+      return res.status(404).send("User not found");
+    }
+    const user = rows[0];
+    const userRole = user.userrole;
+    const adminId = user.id;
+
+    if (userRole !== "admin" && userRole !== "user") {
+      res.send("Please login to create a poll");
     } else {
-      const adminId = user[0]._id;
-      await UserModel.findOneAndUpdate(
-        { email: userToken.email },
-        { $push: { pollsCreated: { pollId: pollId } } }
-      );
+      // Update pollsCreated in PostgreSQL
+      let pollsCreated = user.pollscreated || [];
+      pollsCreated.push({ pollId: pollId });
+      await pool.query('UPDATE users SET pollsCreated = $1 WHERE id = $2', [JSON.stringify(pollsCreated), adminId]);
       
-      const pollUrl = `https://votek.netlify.app/event/${pollId}`;
-      const formattedQuestions = questions.map((question) => {
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+      const pollUrl = `${frontendUrl}/event/${pollId}`;
+      const formattedQuestions = (questions || []).map((question) => {
         const questionRef = pollRef.child("questions").push();
         const questionId = questionRef.key;
-        const formattedOptions = question.options.map((option) => {
-          const optionRef = questionRef.child("options").push();
-          const optionId = optionRef.key;
-          return {
-            [optionId]: {
-              option,
-              votes: 0,
-            },
-          };
-        });
-        const options = Object.assign({}, ...formattedOptions);
-        return {
-          [questionId]: {
-            question: question.question,
-            maxSelections: question.maxSelections,
-            options,
-            type: question.type,
-            totalVotes: 0,
-          },
+        
+        let questionData = {
+          question: question.question,
+          maxSelections: question.maxSelections || 1,
+          type: question.type || "single",
+          totalVotes: 0,
         };
+
+        if (question.type === "imagechoice") {
+          const formattedOptions = (question.options || []).map((option) => {
+            const optionRef = questionRef.child("options").push();
+            const optionId = optionRef.key;
+            return {
+              [optionId]: {
+                option: option.option || "",
+                image: option.image || "",
+                votes: 0,
+              },
+            };
+          });
+          questionData.options = Object.assign({}, ...formattedOptions);
+        } else if (question.type === "open-ended") {
+          questionData.responses = [];
+          // Open ended doesn't have options in the traditional sense
+        } else {
+          // Default single/multi choice
+          const formattedOptions = (question.options || []).map((option) => {
+            const optionRef = questionRef.child("options").push();
+            const optionId = optionRef.key;
+            return {
+              [optionId]: {
+                option,
+                votes: 0,
+              },
+            };
+          });
+          questionData.options = Object.assign({}, ...formattedOptions);
+        }
+
+        return { [questionId]: questionData };
       });
+
       const questionsData = Object.assign({}, ...formattedQuestions);
       const pollData = {
         pollName,
+        topic: topic || "General",
+        topicImage: topicImage || "",
         pollId,
         questions: questionsData,
-        pollStatus,
+        pollStatus: pollStatus || "live",
         adminId: adminId.toString(),
         pollCreatedAt,
         pollEndsAt,
@@ -80,6 +110,7 @@ firebaseController.post("/create-poll", async (req, res) => {
           });
         })
         .catch((error) => {
+          console.error("Firebase Error:", error);
           res.status(500).json({ message: "Failed to create poll" });
         });
     }
@@ -93,9 +124,11 @@ firebaseController.post("/vote", async (req, res) => {
   } else {
     const token = req.headers.authorization.split(" ")[1];
     const userToken = decryptToken(token);
-    console.log(userToken);
-    const user = await UserModel.find({ email: userToken.email });
-    const userId = user[0]?._id;
+    
+    // Replace legacy UserModel with PostgreSQL pool query
+    const { rows: userRows } = await pool.query('SELECT * FROM users WHERE email = $1', [userToken.email]);
+    const user = userRows[0];
+    const userId = user?.id;
 
     if (!userId) {
       res.status(400).send("User not found");
@@ -110,18 +143,14 @@ firebaseController.post("/vote", async (req, res) => {
         } else {
           pollRef.child("usersAttended").push(userId.toString());
 
-          await UserModel.findOneAndUpdate(
-            { _id: userId },
-            {
-              $push: {
-                pollsAttended: {
-                  pollData: pollData,
-                  pollName: pollName,
-                  pollId: pollId,
-                },
-              },
-            }
-          );
+          // Update pollsAttended in PostgreSQL
+          let pollsAttended = user.pollsattended || [];
+          pollsAttended.push({
+            pollData: pollData,
+            pollName: pollName,
+            pollId: pollId,
+          });
+          await pool.query('UPDATE users SET pollsAttended = $1 WHERE id = $2', [JSON.stringify(pollsAttended), userId]);
 
           pollRef.once("value", (snapshot) => {
             const pollData = snapshot.val();
@@ -129,20 +158,33 @@ firebaseController.post("/vote", async (req, res) => {
             for (const selectedAnswer of selectedAnswers) {
               const { questionId, optionsIds } = selectedAnswer;
               const question = pollData.questions[questionId];
-              const options = optionsIds.map(
-                (optionId) => question.options[optionId]
-              );
-              options.map((option) => {
-                option.votes++;
-                if (option.votedBy == null) {
-                  option.votedBy = [];
-              }
-              option.votedBy.push({
+              
+              if (question.type === "openended") {
+                if (!question.responses) {
+                  question.responses = [];
+                }
+                question.responses.push({
+                  text: optionsIds[0],
                   email: userToken.email,
-                  userId: userId,
-                  fullName: user[0].fullName
-              });
-              });
+                  userId: userId.toString(),
+                  fullName: user.fullname
+                });
+              } else {
+                const options = optionsIds.map(
+                  (optionId) => question.options[optionId]
+                );
+                options.forEach((option) => {
+                  option.votes++;
+                  if (!option.votedBy) {
+                    option.votedBy = [];
+                  }
+                  option.votedBy.push({
+                    email: userToken.email,
+                    userId: userId.toString(),
+                    fullName: user.fullname
+                  });
+                });
+              }
               question.totalVotes++;
             }
 
@@ -172,17 +214,20 @@ firebaseController.get("/live-polls", async (req, res) => {
     } else {
       const token = req.headers.authorization.split(" ")[1];
       const userToken = decryptToken(token);
-      const user = await UserModel.find({ email: userToken.email });
-      const userRole = user[0].userRole;
-      if (userRole !== "admin") {
-        res.send("Only admin is allowed to see a poll");
-      } else {
-        const adminId = user[0]._id;
-        const filteredPolls = newPoll.filter(
-          (poll) => poll.adminId === adminId.toString()
-        );
-        res.send(filteredPolls);
-      }
+      const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [userToken.email]);
+    if (rows.length === 0) {
+      return res.status(404).send("User not found");
+    }
+    const userRole = rows[0].userrole;
+    if (userRole !== "admin" && userRole !== "user") {
+      res.send("Please login to see your polls");
+    } else {
+      const adminId = rows[0].id.toString();
+      const filteredPolls = newPoll.filter(
+        (poll) => poll.adminId === adminId
+      );
+      res.json(filteredPolls);
+    }
     }
   } catch (error) {
     res.status(500).send("Failed to retrieve poll data.");

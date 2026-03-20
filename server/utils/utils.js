@@ -60,44 +60,54 @@ const generateToken = ({ userId=null,email=null ,fullName=null,role=null  }) => 
   }
 
   function pollToArray(pollsObject) {
+    if (!pollsObject) return [];
     const pollsArray = [];
     
     for (const pollId in pollsObject) {
       const poll = pollsObject[pollId];
+      if (!poll) continue;
+      
       const questionsArray = [];
-  
-      for (const questionId in poll.questions) {
-        const question = poll.questions[questionId];
-        const optionsArray = [];
-  
-        for (const optionId in question.options) {
-          const option = question.options[optionId];
-          optionsArray.push({
-            optionId,
-            option: option.option,
-            votes: option.votes,
-            votedBy:option.votedBy
+      if (poll.questions) {
+        for (const questionId in poll.questions) {
+          const question = poll.questions[questionId];
+          const optionsArray = [];
+          
+          if (question.options) {
+            for (const optionId in question.options) {
+              const option = question.options[optionId];
+              optionsArray.push({
+                optionId,
+                option: option.option,
+                votes: option.votes,
+                votedBy: option.votedBy
+              });
+            }
+          }
+    
+          questionsArray.push({
+            questionId,
+            question: question.question,
+            maxSelections: question.maxSelections,
+            totalVotes: question.totalVotes,
+            options: optionsArray,
+            type: question.type,
+            responses: question.responses || []
           });
         }
-  
-        questionsArray.push({
-          questionId,
-          question: question.question,
-          maxSelections: question.maxSelections,
-          totalVotes: question.totalVotes,
-          options: optionsArray,
-        });
       }
   
       pollsArray.push({
         pollId,
-        adminId: poll.adminId,
-        usersAttended:poll.usersAttended,
+        adminId: poll.adminId ? poll.adminId.toString() : "",
+        usersAttended: poll.usersAttended,
         pollCreatedAt: poll.pollCreatedAt,
         pollEndsAt: poll.pollEndsAt,
         pollName: poll.pollName,
         pollStatus: poll.pollStatus,
         pollUrl: poll.pollUrl,
+        topic: poll.topic,
+        topicImage: poll.topicImage,
         questions: questionsArray,
       });
     }

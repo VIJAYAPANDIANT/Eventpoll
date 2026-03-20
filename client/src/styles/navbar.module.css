@@ -1,18 +1,59 @@
 .navContainer {
-  height: 74px;
-  background-color: #ffffff;
+  height: 70px;
+  background-color: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   width: 100%;
-  border-bottom: 2px solid rgb(232, 231, 231);
-  font-family: 'Open Sans';
-  font-weight: 500;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
 }
 
 .logo {
   background-image: url("https://user-images.githubusercontent.com/97525465/226943245-2d818b81-d5aa-4f1d-bc89-e82c3dbde51d.png");
-  width: 100px;
-  height: 40px;
+  width: 110px;
+  height: 44px;
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.navLink {
+  color: #475569;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+}
+
+.navLink:hover {
+  color: #D71A20;
+  background-color: rgba(215, 26, 32, 0.05);
+}
+
+.loginButton {
+  background: #D71A20 !important;
+  color: white !important;
+  border-radius: 10px !important;
+  padding: 0 24px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(215, 26, 32, 0.2) !important;
+}
+
+.loginButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(215, 26, 32, 0.3) !important;
+  filter: brightness(1.1);
 }
 
