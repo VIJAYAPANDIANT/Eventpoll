@@ -1,78 +1,45 @@
-# Votek - High-Performance Real-Time Voting Application
+# 🗳️ Votek - Real-Time Voting Platform
 
-### 📝 Brief Overview
-
-**Votek** is a modern, full-stack polling and voting application designed for real-time interaction and dynamic result tracking. Built as a monorepo, it leverages a robust React frontend and a scalable Express backend to provide a seamless user experience for creating, participating in, and analyzing polls.
+**Votek** is a premium, full-stack polling application designed for real-time interaction and dynamic data visualization.
 
 ---
 
-### 🔍 Detailed Explanation
+### 🏗️ Modern Architecture
+Built as a **Monorepo** using **NPM Workspaces**, Votek separates concerns while keeping the developer experience unified:
+- `/client`: React (Chakra UI + Framer Motion)
+- `/server`: Node.js & Express (PostgreSQL + JWT)
+- `/api`: Vercel-specific serverless function proxy
 
-#### 🏗️ Architecture & Core Philosophy
-
-Votek is designed with a **Monorepo** architecture, using **NPM Workspaces** to manage both the `client` and `server` within a single repository. This ensures atomic updates, unified dependency management, and a simplified development workflow.
-
-#### ⚡ Key Features
-
-- **Real-Time Live Updates**: Utilizing **Socket.io**, the platform provides instant feedback. When a vote is cast, it reflects immediately on the results chart for all users without a page refresh.
-- **Dynamic Data Visualization**: Powered by **Chart.js** and **React-Chartjs-2**, poll results are presented in stunning, interactive charts.
-- **Secure Authentication**: Implementation of **JWT (JSON Web Tokens)** for session management and **Bcryptjs** for secure password hashing. It also features **Google OAuth** integration for quick access.
-- **Advanced Export Capabilities**: Users can export poll data to **Excel** format using **ExcelJS**, making it ideal for offline analysis.
-- **Responsive & Premium Design**: Built using **Chakra UI** and **Framer Motion**, the interface is sleek, accessible, and fully responsive across all device sizes.
-- **API Documentation**: Integrated **Swagger** UI provides a live, interactive playground for testing backend endpoints.
-
-#### 🛠️ Technology Stack
-
-| Layer | Technologies |
-| :--- | :--- |
-| **Frontend** | React, Redux, Chakra UI, Framer Motion, Axios, Socket.io-client, Chart.js |
-| **Backend** | Node.js, Express, Socket.io, JWT, Bcryptjs, ExcelJS, Swagger |
-| **Database** | PostgreSQL (Neon), MongoDB (Hybrid Support), Firebase (Real-time features) |
-| **Deployment** | Vercel (Production-optimized configuration included) |
+### 🚀 Key Features
+- **⚡ Real-Time**: Instant result updates via Socket.io.
+- **📊 Interactive Charts**: Beautiful data viz with Chart.js.
+- **🔐 Secure Auth**: JWT and Google OAuth 2.0.
+- **📥 Data Export**: Export results to Excel (.xlsx).
+- **🎨 Premium UI**: Glassmorphism and smooth animations.
 
 ---
 
-### 🚀 Getting Started
+### ☁️ Vercel Deployment (Recommended)
 
-#### Prerequisites
+This project is optimized for **Vercel's Modern Architecture**. To deploy:
 
-- **Node.js**: v16 or higher
-- **NPM**: v7 or higher (for workspace support)
-- **Database**: PostgreSQL (e.g., Neon.tech) and a Firebase project if using real-time features.
+1.  **Connect to Vercel**: Import this repository into a new Vercel project.
+2.  **Configure Root Directory**: Leave as `.` (the project root).
+3.  **Set Environment Variables**:
+    - `DATABASE_URL`: Your PostgreSQL connection string.
+    - `JWT_SECRET`: A long, secure random string.
+    - `CI`: Set to `false` to ignore lint warnings during build.
+4.  **One-Time Dashboard Rewrite**: (Optional but recommended) In Vercel Settings -> Rewrites, map all unknown paths to `client/build/index.html`.
 
-#### Installation & Setup
+### 🛠️ Local Development
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd Eventpoll
-   ```
-
-2. **Install all dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**:
-   - Create a `.env` file in the `server` directory.
-   - Required variables: `DATABASE_URL`, `JWT_SECRET`, `PORT`.
-
-4. **Run the application**:
-   - **Development**: `npm start` (Runs both client and server concurrently).
-   - **Client only**: `npm run start:client`
-   - **Server only**: `npm run start:server`
+1.  **Install**: `npm install`
+2.  **Environment**: Create `server/.env` based on `server/env.template`.
+3.  **Run**: `npm start` (Starts both frontend and backend).
 
 ---
 
-### ☁️ Deployment
-
-This project is configured for one-click deployment to **Vercel**.
-- The root includes a `vercel.json` and a `build` script that automatically handles the monorepo routing and static build process.
-- All API requests are automatically routed to the Node.js server via the `/api` prefix.
-
----
-
-### 📚 API Documentation
-Explore and test the API endpoints directly using the built-in Swagger interface:
+### 📚 API Playground
+Explore the API endpoints directly via Swagger:
 - **Local**: `http://localhost:8080/api-docs`
-- **Production**: `https://your-app-domain.com/api-docs`
+- **Production**: `https://<your-app>.vercel.app/api-docs`
