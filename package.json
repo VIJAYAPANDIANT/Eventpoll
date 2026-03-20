@@ -12,7 +12,7 @@
     "start:client": "npm start --workspace=client",
     "start:server": "npm start --workspace=server",
     "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
-    "build": "npm run build --workspace=client && cp -r client/build ./public"
+    "build": "PUBLIC_URL=/ npm run build --workspace=client"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
