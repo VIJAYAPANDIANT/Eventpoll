@@ -52,16 +52,20 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 
 io.attach(server);
 
-server.listen(PORT, async () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-  
-  try {
-    const client = await pool.connect();
-    console.log("✅ Database Connected: Successfully established connection to PostgreSQL");
-    client.release();
-  } catch (err) {
-    console.error("❌ Database Connection Failed!");
-    console.error("Reason:", err.message);
-    console.log("Tip: Check your DATABASE_URL in the .env file.");
-  }
-});
+if (require.main === module) {
+  server.listen(PORT, async () => {
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    
+    try {
+      const client = await pool.connect();
+      console.log("✅ Database Connected: Successfully established connection to PostgreSQL");
+      client.release();
+    } catch (err) {
+      console.error("❌ Database Connection Failed!");
+      console.error("Reason:", err.message);
+      console.log("Tip: Check your DATABASE_URL in the .env file.");
+    }
+  });
+}
+
+module.exports = app;
