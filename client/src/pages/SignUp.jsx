@@ -31,11 +31,10 @@ import { useNavigate } from 'react-router-dom';
     const [nameError, setNameError] = useState("")
     const [emailError, setEmailError] = useState("")
     const [passwordError,setPasswordError] = useState("")
-    const data = useSelector((store)=>store.auth.auth);
+    const { auth: data, isLoading, error } = useSelector((store) => store.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const toast = useToast()
-    const error = useSelector((store) => store.auth.error);
     
 
 const handleClick = ()=>{
@@ -99,16 +98,23 @@ useEffect(()=>{
 
 
 useEffect(()=>{
-if(error?.response?.data?.msg){
-  toast({
-    title: error.response.data.msg,
-    description: "Please check your details and try again.",
-    status: 'warning',
-    duration: 9000,
-    isClosable: true,
-  })
-}
-  
+  if(error?.response?.data?.msg){
+    toast({
+      title: error.response.data.msg,
+      description: "Please check your details and try again.",
+      status: 'warning',
+      duration: 5000,
+      isClosable: true,
+    })
+  } else if (error && !error.response) {
+    toast({
+      title: "Network Error",
+      description: "Could not connect to the server. Please check if the server is running.",
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    })
+  }
 },[error,toast])
 
 
@@ -165,12 +171,21 @@ if(error?.response?.data?.msg){
                 <Checkbox fontFamily={"Open Sans"}>Remember me</Checkbox>
                 {/* <Link color={'blue.500'}>Forgot password?</Link> */}
               </Stack>
-              <Button fontFamily={"Open Sans"} color={'white'} bg={'red.400'} onClick={handleClick} variant={'solid'}>
+              <Button
+                fontFamily={"Open Sans"}
+                color={'white'}
+                bg={'red.400'}
+                onClick={handleClick}
+                variant={'solid'}
+                isLoading={isLoading}
+                loadingText="Signing up..."
+                _hover={{ bg: "red.500" }}
+              >
                 Sign up
               </Button>
             </Stack>
             <Text fontFamily={"Open Sans"} align={'center'}>
-               aleady an account? <Link color={'red.400'} href="/signin">Sign-in</Link>
+               already have an account? <Link color={'red.400'} href="/signin">Sign-in</Link>
               </Text>
           </Stack>
         </Flex>

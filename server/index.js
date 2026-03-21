@@ -6,7 +6,7 @@ const authController=require("./routes/signin.routes");
 const {convertPollData}= require("./utils/utils");
 const {pollController}=require("./routes/poll.routes");
 const {templateController}=require("./routes/template.routes")
-const {firebaseController}=require("./routes/poll.firebase.routes")
+// const {firebaseController}=require("./routes/poll.firebase.routes")
 const app = express();
 const PORT = process.env.PORT || 8080;
 const http = require('http');
@@ -29,7 +29,7 @@ app.use("/api/user", userController);
 app.use("/api/auth", authController);
 app.use("/api/poll",pollController);
 app.use("/api/template",templateController);
-app.use("/api/firebase",firebaseController);
+// app.use("/api/firebase",firebaseController);
 
 // ---------------Socket.io setup to get live changes ------->
 const io = new Server({
