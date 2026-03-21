@@ -36,6 +36,8 @@ Votek allows **admins** to create and manage polls with various question types (
 
 The platform was migrated from MongoDB + Firebase to **PostgreSQL (Neon)**, retaining Firebase Realtime Database for live poll broadcasting. The backend Express server is hosted as a **Vercel Serverless Function**, making it globally fast and scalable with zero infrastructure management.
 
+🎥 **[Watch Website Demo Video](https://screenapp.io/app/v/gqNauhDjUd)**
+
 ---
 
 ## 🌍 Live Demo
